@@ -7,7 +7,7 @@ Just run `cargo run` to run it. It relies on `cursive` for the TUI.
 
 ## TODO
 
-- I'm still finding out how to select multiple radio buttons so that we can at least toggle screens on/off
+- The list of display modes should be a scrollview, otherwise content gets lost when the screen is too small
 
 ## Screenshot
 
