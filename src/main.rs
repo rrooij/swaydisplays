@@ -1,7 +1,7 @@
 mod display;
 
 use cursive::view::Nameable;
-use cursive::views::{Checkbox, Dialog, LinearLayout, RadioGroup, TextView, ViewRef};
+use cursive::views::{Checkbox, Dialog, LinearLayout, RadioGroup, ScrollView, TextView, ViewRef};
 use display::{get_displays, Display, Mode};
 use std::collections::HashMap;
 
@@ -60,7 +60,7 @@ fn main() {
 
     siv.add_layer(
         Dialog::new()
-            .content(linear)
+            .content(ScrollView::new(linear).show_scrollbars(true))
             .title("Displays")
             .button("Set display", |s| {
                 s.with_user_data(|user_data: &mut HashMap<String, Display>| {
