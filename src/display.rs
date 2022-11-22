@@ -38,7 +38,7 @@ impl Display {
                 "{}x{}@{}Hz",
                 display_mode.width,
                 display_mode.height,
-                display_mode.refresh / 1000
+                display_mode.refresh as f32 / 1000_f32
             ))
             .output()
             .expect("failed to execute process");
