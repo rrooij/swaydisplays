@@ -84,8 +84,7 @@ fn add_modes(
 ) {
     for mode in &display.modes {
         let display_name = format!(
-            "{} {}x{} - {}hz",
-            display.name,
+            "{}x{} - {}hz",
             mode.width,
             mode.height,
             mode.refresh / 1000
