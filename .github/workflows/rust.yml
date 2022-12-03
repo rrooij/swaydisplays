@@ -4,10 +4,6 @@ name: Rust
 on:
   pull_request:
   push:
-    branches:
-      - main
-    tags:
-      - 'v*.*.*'
 
 jobs:
   test:
