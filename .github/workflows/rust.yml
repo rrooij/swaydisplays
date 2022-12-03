@@ -1,20 +1,87 @@
 name: Rust
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
-env:
-  CARGO_TERM_COLOR: always
+on:
+  pull_request:
+  push:
 
 jobs:
-  build:
-
+  test:
+    name: Test
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        build: [stable]
+
     steps:
-    - uses: actions/checkout@v3
-    - name: Run tests
-      run: cargo test --verbose
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust || 'stable' }}
+          profile: minimal
+          override: true
+
+      - name: Build debug
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+
+      - name: Build debug
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+
+      - name: Test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+
+
+  create-release:
+    name: deploy
+    needs: [test]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [ aarch64-unknown-linux-gnu, armv7-unknown-linux-gnueabihf, x86_64-unknown-linux-gnu]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+          target: ${{ matrix.target }}
+
+      - name: Build target
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --release --target ${{ matrix.target }}
+
+      - name: Package
+        shell: bash
+        run: |
+          # TODO:
+          # strip target/${{ matrix.target }}/release/rust-ci
+          cd target/${{ matrix.target }}/release
+          # UPDATEME: replace the string "rust-ci" with your binary's name.
+          tar czvf ../../../swaydisplays-${{ matrix.target }}.tar.gz swaydisplays
+          cd -
+
+      - name: Publish
+        uses: softprops/action-gh-release@v1
+        # TODO: if any of the build step fails, the release should be deleted.
+        with:
+            # UPDATEME: Replace "rust-ci" with your binary name but keep the star (*).
+            files: 'swaydisplays*'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
