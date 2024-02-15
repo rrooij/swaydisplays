@@ -39,11 +39,11 @@ fn main() {
                 let mut view: ViewRef<LinearLayout> =
                     s.find_name(&selected_display_first.name).unwrap();
                 s.with_user_data(|user_data: &mut HashMap<String, Display>| {
-                    let mut selected_display = &mut user_data.get_mut(&display_name).unwrap();
+                    let selected_display = &mut user_data.get_mut(&display_name).unwrap();
                     match checked {
                         true => {
                             selected_display.active = true;
-                            add_modes(&mut *view, selected_display, checkbox_display_group.clone());
+                            add_modes(&mut view, selected_display, checkbox_display_group.clone());
                         }
                         false => {
                             selected_display.active = false;
@@ -83,12 +83,7 @@ fn add_modes(
     mut display_group: RadioGroup<Mode>,
 ) {
     for mode in &display.modes {
-        let display_name = format!(
-            "{}x{} - {}hz",
-            mode.width,
-            mode.height,
-            mode.refresh / 1000
-        );
+        let display_name = format!("{}x{} - {}hz", mode.width, mode.height, mode.refresh / 1000);
 
         let mut button = display_group.button(mode.clone(), display_name.clone());
         let mode_clone = mode.clone();
@@ -100,7 +95,7 @@ fn add_modes(
     let display_name = display.name.clone();
     display_group.set_on_change(move |s, display_mode: &Mode| {
         s.with_user_data(|user_data: &mut HashMap<String, Display>| {
-            let mut selected_display = user_data.get_mut(&display_name).unwrap();
+            let selected_display = user_data.get_mut(&display_name).unwrap();
             selected_display.current_mode = Some(display_mode.clone());
         });
     });
